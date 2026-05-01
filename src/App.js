@@ -53,7 +53,7 @@ function App() {
 
   useEffect(() => {
     if (user) {
-      axios.get(`http://localhost:8080/api/categories?userId=${user.id}&type=${type}`)
+      axios.get(`https://expense-manager-api-z8j8.onrender.com/api/categories?userId=${user.id}&type=${type}`)
         .then(res => {
           setCategories(res.data);
           if(res.data.length > 0 && !editingTxId) setSelectedCategoryId(res.data[0].id);
@@ -67,7 +67,7 @@ function App() {
   // ==========================================
   const fetchTransactions = async (userId, m = reportMonth, y = reportYear, mode = viewMode) => {
     try {
-      let url = `http://localhost:8080/api/transactions/user/${userId}`;
+      let url = `https://expense-manager-api-z8j8.onrender.com/api/transactions/user/${userId}`;
       if (mode === 'ALL') {
           url += `?all=true`;
       } else {
@@ -98,7 +98,7 @@ function App() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post(`http://localhost:8080/api/auth/login`, { username, password });
+      const res = await axios.post(`https://expense-manager-api-z8j8.onrender.com/api/auth/login`, { username, password });
       if (res.status === 200) {
         setUser(res.data);
         setIsLoggedIn(true);
@@ -113,7 +113,7 @@ function App() {
   const handleRegisterStep1 = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://localhost:8080/api/auth/send-register-otp', { email });
+      const res = await axios.post('https://expense-manager-api-z8j8.onrender.com/api/auth/send-register-otp', { email });
       setMessage({ text: res.data || 'Mã xác nhận đã được gửi đến Email của bạn!', isError: false });
       setRegStep(2); 
     } catch (err) {
@@ -126,7 +126,7 @@ function App() {
     e.preventDefault();
     try {
       const payload = { username, password, email, otp: regOtp };
-      await axios.post('http://localhost:8080/api/auth/register-with-otp', payload);
+      await axios.post('https://expense-manager-api-z8j8.onrender.com/api/auth/register-with-otp', payload);
       
       setMessage({ text: 'Đăng ký thành công! Hãy đăng nhập.', isError: false });
       setTimeout(() => {
@@ -145,7 +145,7 @@ function App() {
   const handleSendOtp = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://localhost:8080/api/auth/forgot-password', { email: fpEmail });
+      const res = await axios.post('https://expense-manager-api-z8j8.onrender.com/api/auth/forgot-password', { email: fpEmail });
       setMessage({ text: res.data, isError: false });
       setFpStep(2); 
     } catch (err) {
@@ -157,7 +157,7 @@ function App() {
   const handleVerifyOtp = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://localhost:8080/api/auth/verify-otp', { email: fpEmail, otp: fpOtp });
+      const res = await axios.post('https://expense-manager-api-z8j8.onrender.com/api/auth/verify-otp', { email: fpEmail, otp: fpOtp });
       setMessage({ text: res.data, isError: false });
       setFpStep(3); 
     } catch (err) {
@@ -169,7 +169,7 @@ function App() {
   const handleResetPassword = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://localhost:8080/api/auth/reset-password', { email: fpEmail, newPassword: fpNewPassword });
+      const res = await axios.post('https://expense-manager-api-z8j8.onrender.com/api/auth/reset-password', { email: fpEmail, newPassword: fpNewPassword });
       setMessage({ text: res.data, isError: false });
       setTimeout(() => {
         setIsForgotPasswordMode(false); 
@@ -212,9 +212,9 @@ function App() {
 
     try {
       if (editingTxId) {
-        await axios.put(`http://localhost:8080/api/transactions/${editingTxId}`, payload);
+        await axios.put(`https://expense-manager-api-z8j8.onrender.com/api/transactions/${editingTxId}`, payload);
       } else {
-        await axios.post('http://localhost:8080/api/transactions', payload);
+        await axios.post('https://expense-manager-api-z8j8.onrender.com/api/transactions', payload);
       }
       
       setIsModalOpen(false);
@@ -248,7 +248,7 @@ function App() {
   const handleDeleteTransaction = async (id) => {
     if(window.confirm("Bạn có chắc chắn muốn xóa giao dịch này không? Xóa xong không khôi phục được đâu!")) {
       try {
-        await axios.delete(`http://localhost:8080/api/transactions/${id}`);
+        await axios.delete(`https://expense-manager-api-z8j8.onrender.com/api/transactions/${id}`);
         fetchTransactions(user.id, reportMonth, reportYear, viewMode);
       } catch (error) {
         alert("Lỗi khi xóa giao dịch!");
