@@ -105,7 +105,7 @@ function App() {
         setMessage({ text: '', isError: false }); 
       }
     } catch (err) {
-      const errorMsg = typeof err.response?.data === 'string' ? err.response.data : 'Sai tài khoản hoặc mật khẩu!';
+      const errorMsg = (err.response && typeof err.response.data === 'string') ? err.response.data : 'Sai tài khoản hoặc mật khẩu!';
       setMessage({ text: errorMsg, isError: true });
     }
   };
@@ -117,7 +117,7 @@ function App() {
       setMessage({ text: res.data || 'Mã xác nhận đã được gửi đến Email của bạn!', isError: false });
       setRegStep(2); 
     } catch (err) {
-      const errorMsg = typeof err.response?.data === 'string' ? err.response.data : 'Lỗi hệ thống khi gửi mã OTP!';
+      const errorMsg = (err.response && typeof err.response.data === 'string') ? err.response.data : 'Lỗi hệ thống khi gửi mã OTP!';
       setMessage({ text: errorMsg, isError: true });
     }
   };
@@ -137,7 +137,7 @@ function App() {
         setMessage({ text: '', isError: false });
       }, 2000);
     } catch (err) {
-      const errorMsg = typeof err.response?.data === 'string' ? err.response.data : 'Mã xác nhận không đúng hoặc đã hết hạn!';
+      const errorMsg = (err.response && typeof err.response.data === 'string') ? err.response.data : 'Mã xác nhận không đúng hoặc đã hết hạn!';
       setMessage({ text: errorMsg, isError: true });
     }
   };
@@ -149,7 +149,7 @@ function App() {
       setMessage({ text: res.data, isError: false });
       setFpStep(2); 
     } catch (err) {
-      const errorMsg = typeof err.response?.data === 'string' ? err.response.data : 'Lỗi gửi email!';
+      const errorMsg = (err.response && typeof err.response.data === 'string') ? err.response.data : 'Lỗi gửi email!';
       setMessage({ text: errorMsg, isError: true });
     }
   };
@@ -161,7 +161,7 @@ function App() {
       setMessage({ text: res.data, isError: false });
       setFpStep(3); 
     } catch (err) {
-      const errorMsg = typeof err.response?.data === 'string' ? err.response.data : 'Mã OTP không hợp lệ!';
+      const errorMsg = (err.response && typeof err.response.data === 'string') ? err.response.data : 'Mã OTP không hợp lệ!';
       setMessage({ text: errorMsg, isError: true });
     }
   };
@@ -178,7 +178,7 @@ function App() {
         setMessage({ text: 'Đổi mật khẩu thành công! Mời đăng nhập lại.', isError: false });
       }, 2000);
     } catch (err) {
-      const errorMsg = typeof err.response?.data === 'string' ? err.response.data : 'Lỗi đổi mật khẩu!';
+      const errorMsg = (err.response && typeof err.response.data === 'string') ? err.response.data : 'Lỗi đổi mật khẩu!';
       setMessage({ text: errorMsg, isError: true });
     }
   };
