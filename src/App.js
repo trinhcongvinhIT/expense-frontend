@@ -430,8 +430,6 @@ function App() {
           <div className="w-full lg:w-[45%] bg-gradient-to-br from-sky-50 via-white to-teal-50 p-8 lg:p-16 flex flex-col justify-center items-center border-l border-slate-100 relative shadow-inner">
             <div className="absolute inset-0 bg-white/60"></div>
             <div className="w-full max-w-sm relative z-10">
-              <h3 className="text-slate-800 text-2xl font-black mb-8 leading-tight text-center lg:text-left tracking-tight">Đồ án tốt nghiệp <br/> <span className="text-teal-500">Trịnh Công Vĩnh_PM27.16.</span></h3>
-
               <div className="bg-white rounded-[2rem] p-8 shadow-2xl shadow-teal-900/10 relative overflow-hidden border border-slate-100/50 hover:shadow-teal-900/15 transition-all">
                 <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-sky-400 to-teal-400 z-10"></div>
                 <p className="text-slate-400 font-black text-[11px] uppercase tracking-[0.2em] mb-6 text-center">{isForgotPasswordMode ? 'QUÊN MẬT KHẨU' : (isRegisterMode ? 'ĐĂNG KÝ TÀI KHOẢN' : 'ĐĂNG NHẬP')}</p>
