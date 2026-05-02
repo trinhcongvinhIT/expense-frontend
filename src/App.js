@@ -740,10 +740,33 @@ function App() {
           </div>
         )}
 
-        {activeTab === 'transactions' && (
+{activeTab === 'transactions' && (
           <div className="bg-white rounded-2xl md:rounded-[2.5rem] shadow-xl md:shadow-2xl shadow-slate-200/50 border border-slate-100 overflow-hidden text-slate-800 relative z-10 hover:shadow-slate-200 transition-all">
-             <div className="p-4 md:p-6 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                 <h2 className="text-base md:text-lg font-black text-slate-700">Danh sách Giao dịch <span className="block sm:inline text-xs md:text-base font-medium text-slate-400">{viewMode === 'ALL' ? '(Tất cả)' : `(Tháng ${reportMonth}/${reportYear})`}</span></h2>
+             <div className="p-4 md:p-6 border-b border-slate-100 bg-slate-50/50 flex flex-col gap-4">
+                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                     <h2 className="text-base md:text-lg font-black text-slate-700">
+                         Danh sách Giao dịch 
+                     </h2>                 
+                     <div className="bg-slate-200/50 p-1.5 rounded-xl md:rounded-2xl flex gap-1 border border-slate-200 shadow-inner w-full sm:w-auto">
+                       <button onClick={() => setViewMode('ALL')} className={`flex-1 sm:flex-none px-4 md:px-6 py-2 rounded-lg md:rounded-xl font-black text-xs md:text-sm transition-all tracking-tight ${viewMode === 'ALL' ? 'bg-white shadow-md text-teal-600' : 'text-slate-400 hover:text-slate-600'}`}>🌍 Tất cả</button>
+                       <button onClick={() => setViewMode('MONTH')} className={`flex-1 sm:flex-none px-4 md:px-6 py-2 rounded-lg md:rounded-xl font-black text-xs md:text-sm transition-all tracking-tight ${viewMode === 'MONTH' ? 'bg-white shadow-md text-teal-600' : 'text-slate-400 hover:text-slate-600'}`}>📅 Từng tháng</button>
+                     </div>
+                 </div>
+                 {viewMode === 'MONTH' && (
+                   <div className="flex items-center justify-center sm:justify-end gap-4 text-teal-600 font-black w-full pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-200/60 mt-2 sm:mt-0">
+                       <button onClick={() => {
+                         let newM = reportMonth - 1; let newY = reportYear;
+                         if(newM < 1){ newM = 12; newY--;}
+                         setReportMonth(newM); setReportYear(newY);
+                       }} className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white hover:bg-teal-50 flex items-center justify-center transition-all shadow-sm border border-slate-200 hover:border-teal-300">&lt;</button>
+                       <span className="text-sm md:text-base">Tháng {reportMonth} / {reportYear}</span>
+                       <button onClick={() => {
+                         let newM = reportMonth + 1; let newY = reportYear;
+                         if(newM > 12){ newM = 1; newY++;}
+                         setReportMonth(newM); setReportYear(newY);
+                       }} className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white hover:bg-teal-50 flex items-center justify-center transition-all shadow-sm border border-slate-200 hover:border-teal-300">&gt;</button>
+                   </div>
+                 )}
              </div>
              <div className="overflow-x-auto">
                <table className="w-full text-left min-w-[600px]">
