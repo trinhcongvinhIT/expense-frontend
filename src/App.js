@@ -200,13 +200,24 @@ function App() {
     setIsModalOpen(true);
   };
 
+  // Hàm xử lý định dạng tiền tệ (Thêm dấu chấm)
+  const handleAmountChange = (e) => {
+    let value = e.target.value;
+    // 1. Xóa hết tất cả các ký tự không phải là số
+    const rawValue = value.replace(/\D/g, '');
+    // 2. Thêm dấu chấm phân cách hàng nghìn
+    const formattedValue = rawValue.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    // 3. Cập nhật lại state
+    setAmount(formattedValue);
+  };
+
   const handleSaveTransaction = async (e) => {
     e.preventDefault();
     if (!selectedCategoryId) return alert("Chưa có danh mục nào!");
 
     const payload = {
       userId: user.id,
-      amount: Math.round(parseFloat(amount)),
+      amount: Math.round(parseFloat(amount.toString().replace(/\./g, ''))), // Loại bỏ dấu chấm trước khi gửi
       description: description,
       categoryId: selectedCategoryId,
       type: type,
@@ -240,7 +251,9 @@ function App() {
 
   const handleEditClick = (t) => {
     setEditingTxId(t.id);
-    setAmount(t.amount);
+    // Format lại số tiền từ database thêm dấu chấm để hiển thị
+    const formattedAmount = t.amount ? t.amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') : '';
+    setAmount(formattedAmount);
     setDescription(t.description);
     setType(t.type);
     setTransactionDate(t.transactionDate || new Date().toISOString().split('T')[0]);
@@ -461,7 +474,7 @@ function App() {
                     {fpStep === 2 && (
                       <form onSubmit={handleVerifyOtp} className="space-y-4">
                         <p className="text-xs text-slate-500 text-center mb-2">Kiểm tra hộp thư đến của bạn</p>
-                        <input type="text" placeholder="Nhập mã OTP 6 số" maxLength="6" className="w-full px-6 py-4 rounded-2xl bg-slate-50 border-none outline-none focus:ring-2 focus:ring-sky-300 font-black text-slate-800 placeholder-slate-400 transition-all border border-slate-100 hover:bg-slate-100/50 tracking-[0.5em] text-center text-lg md:text-xl" value={fpOtp} onChange={(e) => setFpOtp(e.target.value)} required />
+                        <input type="text" placeholder="Nhập mã OTP 6 số" maxLength="6" className="w-full px-6 py-4 rounded-2xl bg-slate-50 border-none outline-none focus:ring-2 focus:ring-sky-300 font-black text-slate-800 placeholder-slate-400 transition-all border border-slate-100 hover:bg-slate-100/50 tracking-[0.5em] text-center text-lg md:text-xl placeholder:tracking-normal placeholder:text-sm md:placeholder:text-base placeholder:font-medium" value={fpOtp} onChange={(e) => setFpOtp(e.target.value)} required />
                         <button className="w-full bg-sky-500 hover:bg-sky-600 text-white py-3 md:py-4 rounded-2xl font-black text-xs md:text-sm shadow-lg shadow-sky-500/20 transition-all transform active:scale-95 mt-4 uppercase tracking-widest">Xác nhận OTP</button>
                       </form>
                     )}
@@ -491,13 +504,13 @@ function App() {
                     )}
 
                     {regStep === 2 && (
-                      <form onSubmit={handleRegisterStep2} className="space-y-4">
-                        <p className="text-xs text-slate-500 text-center mb-2">Mã đã gửi về: <br className="md:hidden" /><span className="font-bold text-teal-600">{email}</span></p>
-                        <input type="text" placeholder="Nhập mã OTP 6 số" maxLength="6" className="w-full px-6 py-4 rounded-2xl bg-slate-50 border-none outline-none focus:ring-2 focus:ring-teal-300 font-black text-slate-800 placeholder-slate-400 transition-all border border-slate-100 hover:bg-slate-100/50 tracking-[0.5em] text-center text-lg md:text-xl" value={regOtp} onChange={(e) => setRegOtp(e.target.value)} required />
-                        <button type="submit" className="w-full bg-teal-500 hover:bg-teal-600 text-white py-3 md:py-4 rounded-2xl font-black text-xs md:text-sm shadow-lg shadow-teal-500/20 transition-all transform active:scale-95 mt-4 uppercase tracking-widest">XÁC NHẬN & ĐĂNG KÝ</button>
-                        <button type="button" onClick={() => { setRegStep(1); setMessage({text:'', isError:false}) }} className="w-full text-slate-400 hover:text-teal-600 font-bold text-[10px] md:text-[11px] transition-colors hover:underline mt-2">Nhập sai email? Quay lại</button>
-                      </form>
-                    )}
+                    <form onSubmit={handleRegisterStep2} className="space-y-4">
+                      <p className="text-xs text-slate-500 text-center mb-2">Mã đã gửi về: <br className="md:hidden" /><span className="font-bold text-teal-600">{email}</span></p>
+                      <input type="text" placeholder="Nhập mã OTP 6 số"  maxLength="6" className="w-full px-6 py-4 rounded-2xl bg-slate-50 border-none outline-none focus:ring-2 focus:ring-teal-300 font-black text-slate-800 placeholder-slate-400 transition-all border border-slate-100 hover:bg-slate-100/50 tracking-[0.5em] text-center text-lg md:text-xl placeholder:tracking-normal placeholder:text-sm md:placeholder:text-base placeholder:font-medium" value={regOtp} onChange={(e) => setRegOtp(e.target.value)}  required />
+                      <button type="submit" className="w-full bg-teal-500 hover:bg-teal-600 text-white py-3 md:py-4 rounded-2xl font-black text-xs md:text-sm shadow-lg shadow-teal-500/20 transition-all transform active:scale-95 mt-4 uppercase tracking-widest">XÁC NHẬN & ĐĂNG KÝ</button>
+                      <button type="button" onClick={() => { setRegStep(1); setMessage({text:'', isError:false}) }} className="w-full text-slate-400 hover:text-teal-600 font-bold text-[10px] md:text-[11px] transition-colors hover:underline mt-2">Nhập sai email? Quay lại</button>
+                    </form>
+                  )}
 
                     <button onClick={() => { setIsRegisterMode(false); setRegStep(1); setMessage({ text: '', isError: false }); }} className="w-full mt-6 text-slate-400 hover:text-teal-600 font-bold text-[10px] md:text-[11px] transition-colors uppercase tracking-widest hover:scale-105">← Đã có tài khoản? Đăng nhập</button>
                   </>
@@ -902,7 +915,7 @@ function App() {
                 ))}
               </div>
 
-              <input type="number" placeholder="Số tiền (VNĐ)..." className="w-full bg-slate-50/50 p-4 md:p-5 rounded-xl md:rounded-2xl font-black text-lg md:text-xl outline-none focus:ring-2 focus:ring-teal-300 focus:bg-white focus:shadow-lg transition-all text-slate-800 placeholder-slate-400 border border-slate-100 shadow-inner tabular-nums tracking-tight" value={amount} onChange={(e) => setAmount(e.target.value)} required />
+              <input type="text" placeholder="Số tiền (VNĐ)..." className="w-full bg-slate-50/50 p-4 md:p-5 rounded-xl md:rounded-2xl font-black text-lg md:text-xl outline-none focus:ring-2 focus:ring-teal-300 focus:bg-white focus:shadow-lg transition-all text-slate-800 placeholder-slate-400 border border-slate-100 shadow-inner tabular-nums tracking-tight" value={amount} onChange={handleAmountChange} required />
               <input type="text" placeholder="Ghi chú thêm..." className="w-full bg-slate-50/50 p-4 md:p-5 rounded-xl md:rounded-2xl font-bold text-sm md:text-base outline-none focus:ring-2 focus:ring-teal-300 focus:bg-white focus:shadow-lg transition-all text-slate-800 placeholder-slate-400 border border-slate-100 shadow-inner tracking-tight" value={description} onChange={(e) => setDescription(e.target.value)} required />
               
               <input 
