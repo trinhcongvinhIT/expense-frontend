@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import * as XLSX from 'xlsx'; 
+import Budget from './Budget';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -106,13 +107,15 @@ function App() {
         setUser(res.data);
         setIsLoggedIn(true);
         setMessage({ text: '', isError: false }); 
+        
+        // 🔥 BƠM THÊM DÒNG NÀY: Khắc ID vào bộ nhớ vĩnh viễn của trình duyệt
+        localStorage.setItem('userId', res.data.id);
       }
     } catch (err) {
       const errorMsg = (err.response && typeof err.response.data === 'string') ? err.response.data : 'Sai tài khoản hoặc mật khẩu!';
       setMessage({ text: errorMsg, isError: true });
     }
   };
-
   const handleRegisterStep1 = async (e) => {
     e.preventDefault();
     try {
@@ -638,10 +641,11 @@ function App() {
               <h1 className="text-lg font-black uppercase tracking-tighter text-slate-800">Menu</h1>
             </div>
             <nav className="space-y-3 flex-1">
-              <button onClick={() => handleTabChange('dashboard')} className={`w-full flex items-center gap-3 p-4 rounded-2xl font-black transition-all tracking-tight ${activeTab === 'dashboard' ? 'bg-teal-50 text-teal-700 shadow-sm border border-teal-100' : 'text-slate-500 hover:bg-slate-50 hover:text-teal-600'}`}>📊 Tổng quan</button>
-              <button onClick={() => handleTabChange('transactions')} className={`w-full flex items-center gap-3 p-4 rounded-2xl font-black transition-all tracking-tight ${activeTab === 'transactions' ? 'bg-teal-50 text-teal-700 shadow-sm border border-teal-100' : 'text-slate-500 hover:bg-slate-50 hover:text-teal-600'}`}>💸 Giao dịch</button>
-              <button onClick={() => handleTabChange('reports')} className={`w-full flex items-center gap-3 p-4 rounded-2xl font-black transition-all tracking-tight ${activeTab === 'reports' ? 'bg-teal-50 text-teal-700 shadow-sm border border-teal-100' : 'text-slate-500 hover:bg-slate-50 hover:text-teal-600'}`}>📈 Thống kê</button>
-            </nav>
+           <button onClick={() => setActiveTab('dashboard')} className={`w-full flex items-center gap-3 p-4 rounded-2xl font-black transition-all tracking-tight ${activeTab === 'dashboard' ? 'bg-teal-100/70 text-teal-700 shadow-md shadow-teal-100/50' : 'text-slate-500 hover:bg-slate-100/80 hover:text-teal-600'}`}>📊 Tổng quan</button>
+          <button onClick={() => setActiveTab('transactions')} className={`w-full flex items-center gap-3 p-4 rounded-2xl font-black transition-all tracking-tight ${activeTab === 'transactions' ? 'bg-teal-100/70 text-teal-700 shadow-md shadow-teal-100/50' : 'text-slate-500 hover:bg-slate-100/80 hover:text-teal-600'}`}>💸 Giao dịch</button>
+          <button onClick={() => setActiveTab('reports')} className={`w-full flex items-center gap-3 p-4 rounded-2xl font-black transition-all tracking-tight ${activeTab === 'reports' ? 'bg-teal-100/70 text-teal-700 shadow-md shadow-teal-100/50' : 'text-slate-500 hover:bg-slate-100/80 hover:text-teal-600'}`}>📈 Thống kê</button>
+          <button onClick={() => setActiveTab('budget')} className={`w-full flex items-center gap-3 p-4 rounded-2xl font-black transition-all tracking-tight ${activeTab === 'budget' ? 'bg-teal-100/70 text-teal-700 shadow-md shadow-teal-100/50' : 'text-slate-500 hover:bg-slate-100/80 hover:text-teal-600'}`}>🎯 Ngân sách</button>
+           </nav>
             <button onClick={() => { setIsLoggedIn(false); setIsMobileMenuOpen(false); }} className="w-full p-4 text-rose-500 bg-rose-50 rounded-2xl font-black transition-all tracking-tight flex items-center justify-center gap-2 mt-4">🚪 Đăng xuất</button>
           </div>
         </div>
@@ -657,24 +661,29 @@ function App() {
             </div>
         </div>
         <nav className="space-y-2 flex-1">
-          <button onClick={() => setActiveTab('dashboard')} className={`w-full flex items-center gap-3 p-4 rounded-2xl font-black transition-all tracking-tight ${activeTab === 'dashboard' ? 'bg-teal-100/70 text-teal-700 shadow-md shadow-teal-100/50' : 'text-slate-500 hover:bg-slate-100/80 hover:text-teal-600'}`}>📊 Tổng quan</button>
+           <button onClick={() => setActiveTab('dashboard')} className={`w-full flex items-center gap-3 p-4 rounded-2xl font-black transition-all tracking-tight ${activeTab === 'dashboard' ? 'bg-teal-100/70 text-teal-700 shadow-md shadow-teal-100/50' : 'text-slate-500 hover:bg-slate-100/80 hover:text-teal-600'}`}>📊 Tổng quan</button>
           <button onClick={() => setActiveTab('transactions')} className={`w-full flex items-center gap-3 p-4 rounded-2xl font-black transition-all tracking-tight ${activeTab === 'transactions' ? 'bg-teal-100/70 text-teal-700 shadow-md shadow-teal-100/50' : 'text-slate-500 hover:bg-slate-100/80 hover:text-teal-600'}`}>💸 Giao dịch</button>
           <button onClick={() => setActiveTab('reports')} className={`w-full flex items-center gap-3 p-4 rounded-2xl font-black transition-all tracking-tight ${activeTab === 'reports' ? 'bg-teal-100/70 text-teal-700 shadow-md shadow-teal-100/50' : 'text-slate-500 hover:bg-slate-100/80 hover:text-teal-600'}`}>📈 Thống kê</button>
+          <button onClick={() => setActiveTab('budget')} className={`w-full flex items-center gap-3 p-4 rounded-2xl font-black transition-all tracking-tight ${activeTab === 'budget' ? 'bg-teal-100/70 text-teal-700 shadow-md shadow-teal-100/50' : 'text-slate-500 hover:bg-slate-100/80 hover:text-teal-600'}`}>🎯 Ngân sách</button>
         </nav>
         <button onClick={() => setIsLoggedIn(false)} className="w-full p-4 text-rose-400 hover:bg-rose-50/80 rounded-2xl font-black border-t border-slate-100 mt-4 transition-all tracking-tight">🚪 Đăng xuất</button>
       </div>
 
       {/* 🔴 VÙNG NỘI DUNG CHÍNH BÊN PHẢI (HOẶC BÊN DƯỚI NẾU LÀ MOBILE) */}
       <div className="flex-1 p-4 md:p-12 overflow-y-auto">
-        <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 md:mb-12 relative z-10 pb-4 md:divide-y md:divide-slate-100 gap-4 md:gap-0">
-            <div>
-                <h1 className="text-2xl md:text-4xl font-black text-slate-800 tracking-tight">
-                    Xin chào, <span className="text-teal-500">@{user?.username}</span> 👋
-                </h1>
-                <p className="text-sm md:text-base text-slate-400 font-medium mt-1">Cùng kiểm tra ví tiền của bạn hôm nay nhé!</p>
-            </div>
-            <button onClick={handleOpenCreateModal} className="w-full md:w-auto bg-teal-500 text-white px-6 md:px-8 py-3 md:py-4 rounded-xl md:rounded-2xl font-black shadow-lg shadow-teal-500/20 hover:bg-teal-600 hover:-translate-y-1 transition-all flex items-center justify-center gap-2 hover:shadow-teal-500/30 tracking-tight text-sm md:text-base">+ THÊM GIAO DỊCH</button>
-        </header>
+        
+        {/* 👇 DÙNG ĐIỀU KIỆN ĐỂ ẨN HIỆN HEADER THEO YÊU CẦU 👇 */}
+        {activeTab === 'dashboard' && (
+          <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 md:mb-12 relative z-10 pb-4 md:divide-y md:divide-slate-100 gap-4 md:gap-0">
+              <div>
+                  <h1 className="text-2xl md:text-4xl font-black text-slate-800 tracking-tight">
+                      Xin chào, <span className="text-teal-500">@{user?.username}</span> 👋
+                  </h1>
+                  <p className="text-sm md:text-base text-slate-400 font-medium mt-1">Cùng kiểm tra ví tiền của bạn hôm nay nhé!</p>
+              </div>
+              <button onClick={handleOpenCreateModal} className="w-full md:w-auto bg-teal-500 text-white px-6 md:px-8 py-3 md:py-4 rounded-xl md:rounded-2xl font-black shadow-lg shadow-teal-500/20 hover:bg-teal-600 hover:-translate-y-1 transition-all flex items-center justify-center gap-2 hover:shadow-teal-500/30 tracking-tight text-sm md:text-base">+ THÊM GIAO DỊCH</button>
+          </header>
+        )}
 
         {activeTab === 'dashboard' && (
           <div className="relative z-10 space-y-6 md:space-y-8">
@@ -887,7 +896,7 @@ function App() {
              
           </div>
         )}
-
+{activeTab === 'budget' && <Budget transactions={transactions} user={user} />}
       </div>
 
       {isModalOpen && (
