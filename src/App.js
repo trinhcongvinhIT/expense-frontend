@@ -615,7 +615,7 @@ function App() {
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');`}</style>
 
       {/* 🔴 MENU CHO ĐIỆN THOẠI (NAVBAR TRÊN CÙNG) */}
-      <div className="md:hidden flex items-center justify-between bg-teal-50 p-4 border-b border-slate-200">
+      <div className="md:hidden flex items-center justify-between bg-teal-50 p-4 border-b border-slate-200 sticky top-0 z-50">
         <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-gradient-to-br from-teal-400 to-sky-400 rounded-lg flex items-center justify-center text-white shadow-lg"><span className="text-sm">💰</span></div>
             <h1 className="text-lg font-black tracking-tighter text-slate-800 uppercase">Quản lý Chi Tiêu</h1>
@@ -641,10 +641,10 @@ function App() {
               <h1 className="text-lg font-black uppercase tracking-tighter text-slate-800">Menu</h1>
             </div>
             <nav className="space-y-3 flex-1">
-           <button onClick={() => setActiveTab('dashboard')} className={`w-full flex items-center gap-3 p-4 rounded-2xl font-black transition-all tracking-tight ${activeTab === 'dashboard' ? 'bg-teal-100/70 text-teal-700 shadow-md shadow-teal-100/50' : 'text-slate-500 hover:bg-slate-100/80 hover:text-teal-600'}`}>📊 Tổng quan</button>
-          <button onClick={() => setActiveTab('transactions')} className={`w-full flex items-center gap-3 p-4 rounded-2xl font-black transition-all tracking-tight ${activeTab === 'transactions' ? 'bg-teal-100/70 text-teal-700 shadow-md shadow-teal-100/50' : 'text-slate-500 hover:bg-slate-100/80 hover:text-teal-600'}`}>💸 Giao dịch</button>
-          <button onClick={() => setActiveTab('reports')} className={`w-full flex items-center gap-3 p-4 rounded-2xl font-black transition-all tracking-tight ${activeTab === 'reports' ? 'bg-teal-100/70 text-teal-700 shadow-md shadow-teal-100/50' : 'text-slate-500 hover:bg-slate-100/80 hover:text-teal-600'}`}>📈 Thống kê</button>
-          <button onClick={() => setActiveTab('budget')} className={`w-full flex items-center gap-3 p-4 rounded-2xl font-black transition-all tracking-tight ${activeTab === 'budget' ? 'bg-teal-100/70 text-teal-700 shadow-md shadow-teal-100/50' : 'text-slate-500 hover:bg-slate-100/80 hover:text-teal-600'}`}>🎯 Ngân sách</button>
+           <button onClick={() => handleTabChange('dashboard')} className={`w-full flex items-center gap-3 p-4 rounded-2xl font-black transition-all tracking-tight ${activeTab === 'dashboard' ? 'bg-teal-100/70 text-teal-700 shadow-md shadow-teal-100/50' : 'text-slate-500 hover:bg-slate-100/80 hover:text-teal-600'}`}>📊 Tổng quan</button>
+          <button onClick={() => handleTabChange('transactions')} className={`w-full flex items-center gap-3 p-4 rounded-2xl font-black transition-all tracking-tight ${activeTab === 'transactions' ? 'bg-teal-100/70 text-teal-700 shadow-md shadow-teal-100/50' : 'text-slate-500 hover:bg-slate-100/80 hover:text-teal-600'}`}>💸 Giao dịch</button>
+          <button onClick={() => handleTabChange('reports')} className={`w-full flex items-center gap-3 p-4 rounded-2xl font-black transition-all tracking-tight ${activeTab === 'reports' ? 'bg-teal-100/70 text-teal-700 shadow-md shadow-teal-100/50' : 'text-slate-500 hover:bg-slate-100/80 hover:text-teal-600'}`}>📈 Thống kê</button>
+          <button onClick={() => handleTabChange('budget')} className={`w-full flex items-center gap-3 p-4 rounded-2xl font-black transition-all tracking-tight ${activeTab === 'budget' ? 'bg-teal-100/70 text-teal-700 shadow-md shadow-teal-100/50' : 'text-slate-500 hover:bg-slate-100/80 hover:text-teal-600'}`}>🎯 Ngân sách</button>
            </nav>
             <button onClick={() => { setIsLoggedIn(false); setIsMobileMenuOpen(false); }} className="w-full p-4 text-rose-500 bg-rose-50 rounded-2xl font-black transition-all tracking-tight flex items-center justify-center gap-2 mt-4">🚪 Đăng xuất</button>
           </div>
