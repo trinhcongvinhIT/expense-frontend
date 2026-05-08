@@ -19,7 +19,7 @@ const Budget = ({ transactions = [] }) => {
 
     const getBackendMonthYear = (dateStr) => dateStr.split('-').reverse().join('/');
 
-    // Đặt chung 1 biến Base URL để sau này dễ đổi (Lúc test ở nhà mày có thể đổi thành http://localhost:8080)
+    // Đặt chung 1 biến Base URL để sau này dễ đổi
     const BASE_URL = 'https://expense-backend-2qzn.onrender.com';
 
     const targetCategories = [
@@ -65,19 +65,34 @@ const Budget = ({ transactions = [] }) => {
             .reduce((sum, t) => sum + t.amount, 0);
     };
 
-    // Hàm lưu tích hợp tạo danh mục
-    const handleSaveBudget = async (targetName, dbCat) => {
+    // Hàm lưu (Có thêm tham số isReset để phân biệt đang Lưu hay Hủy)
+    const handleSaveBudget = async (targetName, dbCat, isReset = false) => {
         const itemKey = dbCat ? dbCat.id : targetName;
-        const amount = budgets[itemKey];
+        // Nếu là Reset thì ép về 0, nếu không thì lấy giá trị người dùng nhập
+        const amount = isReset ? 0 : budgets[itemKey];
         
-        if (!amount || amount <= 0) return alert("Vui lòng nhập số tiền!");
+        if (!isReset && (!amount || amount <= 0)) return alert("Vui lòng nhập số tiền hợp lệ!");
 
-        const isRecurring = window.confirm("Áp dụng mức ngân sách này cho các tháng sau luôn không?");
+        let isRecurring = false;
+        // Chỉ hỏi áp dụng tháng sau nếu là Đặt mới/Sửa mức. Nếu Hủy thì thôi.
+        if (!isReset) {
+            isRecurring = window.confirm("Bạn có muốn áp dụng mức ngân sách này cho các tháng sau luôn không?");
+        } else {
+            const confirmReset = window.confirm("Bạn có chắc chắn muốn hủy hạn mức ngân sách của mục này không?");
+            if (!confirmReset) return; // Nếu đổi ý không hủy nữa thì thôi
+        }
         
         try {
             let categoryId = dbCat ? dbCat.id : null;
 
-            if (!categoryId) {
+            // Nếu chưa có danh mục trong DB mà lại đòi Hủy mức thì vô lý, ta bỏ qua
+            if (isReset && !categoryId) {
+                setActiveInput(null);
+                return;
+            }
+
+            // Tự động tạo danh mục nếu chưa có (Chỉ dùng khi Đặt mới)
+            if (!categoryId && !isReset) {
                 const newCatRes = await axios.post(`${BASE_URL}/api/categories`, {
                     name: targetName,
                     type: 'EXPENSE',
@@ -90,18 +105,24 @@ const Budget = ({ transactions = [] }) => {
             await axios.post(`${BASE_URL}/api/budgets/save`, {
                 userId: parseInt(userId),
                 categoryId: categoryId,
-                amount: parseFloat(amount),
+                amount: isReset ? 0 : parseFloat(amount),
                 monthYear: getBackendMonthYear(selectedDate),
                 recurring: isRecurring
             });
 
-            alert("Đã chốt ngân sách thành công! 🎯");
-            setSavedBudgets({ ...savedBudgets, [categoryId]: amount });
+            if (isReset) {
+                alert("Đã hủy hạn mức thành công! 🗑️");
+            } else {
+                alert("Đã chốt ngân sách thành công! 🎯");
+            }
+            
+            // Cập nhật lại giao diện ngay lập tức
+            setSavedBudgets({ ...savedBudgets, [categoryId]: isReset ? 0 : amount });
             setActiveInput(null); 
-            setBudgets({ ...budgets, [itemKey]: '' }); // Reset ô nhập
+            setBudgets({ ...budgets, [itemKey]: '' }); 
         } catch (err) {
             console.error(err);
-            alert("Lỗi lưu dữ liệu! Vui lòng thử lại.");
+            alert("Lỗi thao tác! Vui lòng thử lại.");
         }
     };
 
@@ -186,6 +207,8 @@ const Budget = ({ transactions = [] }) => {
                                         <p className="text-[11px] font-bold mt-1">
                                             {!dbCat ? (
                                                 <span className="text-slate-400 italic">Chưa phát sinh dữ liệu</span>
+                                            ) : limit === 0 ? (
+                                                <span className="text-slate-400 italic">Chưa đặt hạn mức</span>
                                             ) : (
                                                 <span className="text-teal-600 bg-teal-50 px-2 py-1 rounded-md">
                                                     Định mức: {limit.toLocaleString('vi-VN')} đ
@@ -207,7 +230,7 @@ const Budget = ({ transactions = [] }) => {
                                 </button>
                             </div>
 
-                            {/* Khu Vực Hiển Thị Phần Trăm & Thanh Tiến Độ (Chỉ hiện nếu đã đặt ngân sách) */}
+                            {/* Khu Vực Hiển Thị Phần Trăm & Thanh Tiến Độ (Chỉ hiện nếu đã đặt ngân sách > 0) */}
                             {limit > 0 && (
                                 <div className="mt-2 bg-slate-50 p-4 rounded-2xl border border-slate-100">
                                     <div className="flex justify-between items-end mb-2">
@@ -228,29 +251,40 @@ const Budget = ({ transactions = [] }) => {
                                 </div>
                             )}
 
-                            {/* Ô Nhập Tiền Cực Xịn (Có dấu chấm phân cách) */}
+                            {/* Ô Nhập Tiền Cực Xịn (Có thêm nút Hủy nếu đã có limit) */}
                             {activeInput === itemKey && (
-                                <div className="flex gap-3 pt-4 border-t border-dashed border-slate-200 mt-2 animate-fade-in">
-                                    <div className="relative flex-1">
-                                        <input 
-                                            type="text" // Dùng text để format dấu chấm
-                                            placeholder="Nhập số tiền..."
-                                            value={budgets[itemKey] ? Number(budgets[itemKey]).toLocaleString('vi-VN') : ''}
-                                            onChange={(e) => {
-                                                // Chỉ giữ lại số, xóa hết các ký tự khác (chữ, dấu chấm, dấu phẩy)
-                                                const numericValue = e.target.value.replace(/\D/g, '');
-                                                setBudgets({ ...budgets, [itemKey]: numericValue });
-                                            }}
-                                            className="w-full bg-slate-50 p-4 rounded-xl font-black text-right text-lg text-teal-700 outline-none border border-slate-200 focus:border-teal-400 focus:ring-4 focus:ring-teal-50 transition-all"
-                                        />
-                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-black">VND</span>
+                                <div className="flex flex-col gap-3 pt-4 border-t border-dashed border-slate-200 mt-2 animate-fade-in">
+                                    <div className="flex gap-3">
+                                        <div className="relative flex-1">
+                                            <input 
+                                                type="text" 
+                                                placeholder="Nhập số tiền mới..."
+                                                value={budgets[itemKey] ? Number(budgets[itemKey]).toLocaleString('vi-VN') : ''}
+                                                onChange={(e) => {
+                                                    const numericValue = e.target.value.replace(/\D/g, '');
+                                                    setBudgets({ ...budgets, [itemKey]: numericValue });
+                                                }}
+                                                className="w-full bg-slate-50 p-4 rounded-xl font-black text-right text-lg text-teal-700 outline-none border border-slate-200 focus:border-teal-400 focus:ring-4 focus:ring-teal-50 transition-all"
+                                            />
+                                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-black">VND</span>
+                                        </div>
+                                        <button 
+                                            onClick={() => handleSaveBudget(target.name, dbCat, false)}
+                                            className="bg-slate-900 text-white px-6 py-4 rounded-xl font-black text-[11px] uppercase tracking-widest hover:bg-slate-800 transition-colors shadow-lg active:scale-95 shrink-0"
+                                        >
+                                            Lưu lại
+                                        </button>
                                     </div>
-                                    <button 
-                                        onClick={() => handleSaveBudget(target.name, dbCat)}
-                                        className="bg-slate-900 text-white px-6 py-4 rounded-xl font-black text-[11px] uppercase tracking-widest hover:bg-slate-800 transition-colors shadow-lg active:scale-95"
-                                    >
-                                        Lưu lại
-                                    </button>
+                                    
+                                    {/* NÚT HỦY HẠN MỨC (Chỉ hiện khi đang có ngân sách > 0) */}
+                                    {limit > 0 && (
+                                        <button 
+                                            onClick={() => handleSaveBudget(target.name, dbCat, true)}
+                                            className="text-[11px] font-black text-rose-500 hover:text-rose-700 uppercase tracking-widest self-end mt-1 transition-colors"
+                                        >
+                                            🗑️ Hủy hạn mức mục này
+                                        </button>
+                                    )}
                                 </div>
                             )}
 
